@@ -6,7 +6,6 @@
  * @FilePath src\utils\regExtract.ts
  */
 
-
 /**
  * 循环提取符合所有条件的正则表达式
  * @param regex 正则表达式
@@ -22,11 +21,10 @@ export const extract = (regex, str) => {
     index = regex.lastIndex;
     if (index === regex.lastIndex) {
       error = { id: "infinite", warning: true };
-      console.log(error);
       ++regex.lastIndex;
     }
-    let groups = match.reduce((arr, s, i)=> {
-      return ((i === 0 || arr.push({ s: s })) && arr);
+    let groups = match.reduce((arr, s, i) => {
+      return (i === 0 || arr.push({ s: s })) && arr;
     }, []);
 
     // i：匹配到的字符串在总字符串中的起始位置
