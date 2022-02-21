@@ -50,19 +50,24 @@ export default function AppButton() {
         }}
       >
         <Form
-          onValuesChange={(value) => {
+          onValuesChange={async (value) => {
             if (value.leftText) {
               try {
-                // 将输入的值转换为数组
+                /** 将输入的值转换为数组 */
                 const titleArr = extractData(
                   extract(/title: '(.+?)'/g, value.leftText)
                 );
 
-                // 去除了单位的表头
+                /** 去除了单位的表头 */
                 const deleteTitleArr = titleArr.map((title) => {
-                  return title.replace(/（.+/, "");
+                  // 去除中文的（
+                  let str = title.replace(/（.+/, "");
+                  // 去除英文的括号，因为原型图有些括号是英文的，如果不去除，下面会报错
+                  str = str.replace(/\(/, "");
+                  return str;
                 });
 
+                /** 将表格宽度信息保存起来 */
                 const widthArr = extractData(
                   extract(/width:.+\('(.+)'\)/g, value.leftText)
                 );
