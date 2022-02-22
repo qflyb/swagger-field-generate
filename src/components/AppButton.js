@@ -83,9 +83,13 @@ export default function AppButton() {
                 const noArr = [];
 
                 deleteTitleArr.forEach((value, index) => {
-                  const dataIndex = swaggerData.current?.find((item) => {
-                    return RegExp(value).test(item.title);
-                  })?.dataIndex;
+                  let dataIndex = "";
+
+                  swaggerData.current?.forEach((data) => {
+                    if (value !== data.title) return;
+                    // 如果不以Id结尾，才是正确的值
+                    if (!/Id$/.test(data.dataIndex)) dataIndex = data.dataIndex;
+                  });
 
                   if (!dataIndex) noArr.push(titleArr[index]);
 
