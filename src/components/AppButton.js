@@ -1,7 +1,7 @@
 import * as React from "react";
-import $ from "jquery";
-import { Button, Col, Form, Input, message, Modal, Row, Space } from "antd";
 import { useRef, useState } from "react";
+import $ from "jquery";
+import { Button, Form, Input, message, Modal } from "antd";
 import { extract, extractData } from "../utils/regExtract";
 
 const { TextArea } = Input;
@@ -41,21 +41,27 @@ export default function AppButton() {
         点我
       </Button>
       <Modal
-        title="Basic Modal"
+        title="自动对字段"
         visible={isModalVisible}
         centered
+        destroyOnClose
         width={1000}
         onCancel={() => {
           setIsModalVisible(false);
         }}
       >
         <Form
+          preserve={false}
           onValuesChange={async (value) => {
             if (value.leftText) {
               try {
                 /** 将输入的值转换为数组 */
                 const titleArr = extractData(
                   extract(/title: '(.+?)'/g, value.leftText)
+                );
+
+                const dataIndexArr = extractData(
+                  extract(/dataIndex: '(.+?)'/g, value.leftText)
                 );
 
                 /** 去除了单位的表头 */
@@ -73,16 +79,20 @@ export default function AppButton() {
                 );
 
                 const finalArr = [];
+                /** 没有找到的字段 */
+                const noArr = [];
 
                 deleteTitleArr.forEach((value, index) => {
                   const dataIndex = swaggerData.current?.find((item) => {
                     return RegExp(value).test(item.title);
                   })?.dataIndex;
 
+                  if (!dataIndex) noArr.push(titleArr[index]);
+
                   finalArr.push({
                     title: titleArr[index],
-                    key: dataIndex || "没找到",
-                    dataIndex: dataIndex || "没找到",
+                    key: dataIndex || dataIndexArr[index],
+                    dataIndex: dataIndex || dataIndexArr[index],
                     hideInSearch: true,
                     width: `tableWidth.get('${widthArr[index]}')`,
                   });
@@ -94,7 +104,10 @@ export default function AppButton() {
                   /"tableWidth.get\((.+?)\)"/g,
                   "tableWidth.get($1)"
                 );
-                form.setFieldsValue({ rightText: str });
+                form.setFieldsValue({
+                  rightText: str,
+                  noText: JSON.stringify(noArr),
+                });
               } catch (e) {
                 message.error("检查title中的单位是否错误");
               }
@@ -108,6 +121,10 @@ export default function AppButton() {
           </Form.Item>
           <Form.Item name="rightText">
             {/* 输出的结果 */}
+            <TextArea rows={10} />
+          </Form.Item>
+          <Form.Item name="noText">
+            {/* 没有找到的字段 */}
             <TextArea rows={10} />
           </Form.Item>
         </Form>

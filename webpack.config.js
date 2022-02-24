@@ -7,7 +7,6 @@ module.exports = {
     filename: "index.js",
     publicPath: "/",
   },
-  watch: true,
   module: {
     rules: [
       {
