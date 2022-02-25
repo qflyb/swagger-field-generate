@@ -1,3 +1,4 @@
+const path = require("path");
 module.exports = {
   module: {
     rules: [
@@ -24,6 +25,11 @@ module.exports = {
             },
           },
         ],
+      },
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
       },
       {
         test: /\.css$/,
@@ -56,6 +62,9 @@ module.exports = {
         ],
       },
     ],
+  },
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js'],
   },
   mode: "production",
   devtool: "source-map",
