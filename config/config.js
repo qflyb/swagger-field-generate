@@ -45,7 +45,14 @@ module.exports = {
           "style-loader",
           // 将 css 文件变成 commonjs 模块加载 js 中，里面内容是样式字符串
           "css-loader",
-          "less-loader",
+          {
+            loader: 'less-loader',
+            options: {
+              lessOptions: {
+                javascriptEnabled: true,
+              },
+            },
+          },
         ],
       },
     ],

@@ -2,8 +2,19 @@ import * as React from "react";
 import { useRef, useState } from "react";
 import $ from "jquery";
 import { Button, Form, Input, Modal } from "antd";
-
+import ProDescriptions from '@ant-design/pro-descriptions';
 const { TextArea } = Input;
+
+function treatDeleteTitleArr(tableArr) {
+  /** 去除了单位的表头 */
+  return tableArr?.map((title) => {
+    // 去除中文的（
+    let str = title.replace(/（.+/, "");
+    // 去除英文的括号，因为原型图有些括号是英文的，如果不去除，下面会报错
+    str = str.replace(/\(/, "");
+    return str;
+  });
+}
 
 export default function XTButton() {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -14,7 +25,11 @@ export default function XTButton() {
   const tableArr = useRef([]);
   /** 详情上面的字段，存储起来 */
   const descriptionsArr = useRef([]);
-  const [finalArr, setFinalArr] = useState([]);
+
+  /** 打开的什么弹窗 */
+  const type = useRef("");
+
+  const [finalShowArr, setFinalShowArr] = useState([]);
 
   return (
     <>
@@ -29,20 +44,26 @@ export default function XTButton() {
               tableArr.current.push($(dom).text());
             });
 
+          type.current = "表格";
           setIsModalVisible(true);
         }}
-        style={{ position: "fixed", bottom: "100px", right: "100px" }}
+        style={{ position: "fixed", bottom: "100px", right: "100px",zIndex:9999 }}
       >
         点我对表格
       </Button>
       <Button
         onClick={() => {
+          descriptionsArr.current = [];
+
           // 获取详情列表
-          $(".ant-descriptions-item-content").each((index, dom) => {
-            dom.title = "这是测试是否能用";
+          $(".ant-descriptions-item-label").each((index, dom) => {
+            descriptionsArr.current.push($(dom).text());
           });
+
+          type.current = "详情";
+          setIsModalVisible(true);
         }}
-        style={{ position: "fixed", bottom: "100px", right: "300px" }}
+        style={{ position: "fixed", bottom: "100px", right: "300px",zIndex:9999 }}
       >
         点我对详情
       </Button>
@@ -63,13 +84,13 @@ export default function XTButton() {
               const arr = JSON.parse(value.leftText);
 
               /** 去除了单位的表头 */
-              const deleteTitleArr = tableArr.current?.map((title) => {
-                // 去除中文的（
-                let str = title.replace(/（.+/, "");
-                // 去除英文的括号，因为原型图有些括号是英文的，如果不去除，下面会报错
-                str = str.replace(/\(/, "");
-                return str;
-              });
+              let deleteTitleArr = [];
+
+              if (type.current === "表格")
+                deleteTitleArr = treatDeleteTitleArr(tableArr.current);
+
+              if (type.current === "详情")
+                deleteTitleArr = treatDeleteTitleArr(descriptionsArr.current);
 
               /** 最终打印的字段 */
               const finalArr = [];
@@ -89,7 +110,7 @@ export default function XTButton() {
                 });
               });
 
-              setFinalArr(finalArr);
+              setFinalShowArr(finalArr);
             }
           }}
           form={form}
@@ -99,14 +120,24 @@ export default function XTButton() {
             <TextArea rows={10} />
           </Form.Item>
         </Form>
-
         {/* 这里是将对的字段展示出来 */}
         <div className="xt-show-name">
-          {finalArr?.map((item) => (
-            <div key={item.dataIndex}>
-              <p>{item.title}</p>
-              <p className="xt-show-index">{item.dataIndex}</p>
-            </div>
+          {finalShowArr?.map((item) => (
+            <ProDescriptions
+              column={1}
+              dataSource={item}
+              columns={[
+                {
+                  title: "字段名",
+                  dataIndex: "title",
+                },
+                {
+                  title: "匹配字段",
+                  dataIndex: "dataIndex",
+                  copyable: true,
+                },
+              ]}
+            />
           ))}
         </div>
       </Modal>
