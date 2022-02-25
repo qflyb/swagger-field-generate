@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --watch",
-    "build": "webpack",
+    "dev:xt": "webpack --config ./config/webpack.config.xt.js --watch",
+    "build:xt": "webpack --config ./config/webpack.config.xt.js",
+    "dev:apifox": "webpack --config ./config/webpack.config.apifox.js --watch",
+    "build:apifox": "webpack --config ./config/webpack.config.apifox.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

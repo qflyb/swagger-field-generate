@@ -1,0 +1,8 @@
+.xt-show-name {
+    display: grid;
+    grid-template-columns: 33.33% 33.33% 33.33%;
+}
+
+.xt-show-index {
+    color:red;
+}
